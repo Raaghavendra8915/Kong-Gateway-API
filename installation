@@ -1,0 +1,32 @@
+Install Gateway API CRD
+The Gateway API has certain CRDs that require manual installation. As previously mentioned, I will install the CRDs from the standard channel and explore Package v1 which includes:
+
+Gateway
+GatewayClass
+HTTPRoute
+
+kubectl apply -f \
+  https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/standard-install.yaml
+
+
+Deploy Kong Ingress Controller
+We will use helm to install, let’s add Kong repo and update first.
+
+helm repo add kong https://charts.konghq.com
+helm repo update
+
+
+We need to make sure the kong/ingress chart version is 0.10.2 or later.
+
+helm search repo kong/ingress -o json | jq .[].version
+
+
+Next we can install Kong Ingress Controller with release name my-kong.
+
+helm upgrade -i my-kong kong/ingress -n kong \
+  --set gateway.image.tag=3.5 \
+  --set gateway.env.router_flavor=expressions \
+  --set gateway.admin.enabled=true \
+  --set gateway.admin.http.enabled=true \
+  --set controller.ingressController.installCRDs=false \
+  --create-namespace
