@@ -30,3 +30,18 @@ helm upgrade -i my-kong kong/ingress -n kong \
   --set gateway.admin.http.enabled=true \
   --set controller.ingressController.installCRDs=false \
   --create-namespace
+
+
+Create demo Apps
+Next we will deploy two applications for our demos.
+
+kubectl create namespace httpbin
+kubectl label namespace httpbin shared-gateway-access=true
+kubectl -n httpbin create deployment httpbin --image=mccutchen/go-httpbin
+kubectl -n httpbin expose deployment httpbin --name httpbin-svc --port 8080
+
+kubectl create namespace nginx
+kubectl label namespace nginx shared-gateway-access=true
+kubectl -n nginx create deployment nginx --image=nginx:alpine
+kubectl -n nginx expose deployment nginx --name nginx-svc --port 80
+
