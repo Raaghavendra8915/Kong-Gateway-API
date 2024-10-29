@@ -1,0 +1,54 @@
+HTTPHeaderMatch
+We can match request by header on HTTPRoute directly now. You need to use konghq.com/headers.* annotation to achieve the same on Ingress. Header matching support Exact and RegularExpression.
+
+Exact
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httpbin-route
+  namespace: httpbin
+  annotations:
+    konghq.com/strip-path: 'true'
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: kong-gw-demo
+      namespace: kong
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /test
+          headers:
+            - name: "Content-type"
+              type: Exact
+              value: "application/json"
+      backendRefs:
+        - name: httpbin-svc
+          kind: Service
+          port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /nginx
+          headers:
+            - name: "x-version"
+              type: Exact
+              value: "2"
+      backendRefs:
+        - name: nginx-svc
+          kind: Service
+          port: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /productpage
+          headers:
+            - name: "x-version"
+              type: Exact
+              value: "3"
+      backendRefs:
+        - name: productpage
+          kind: Service
+          port: 9080
