@@ -1,0 +1,32 @@
+HTTPRouteMatch
+Let’s explore the criteria that can be utilized for matching requests.
+
+HTTPPathMatch
+Similar to using Ingress, we can use annotations on HTTPRoute to enhance routing capability.
+
+The first criteria is to match requests path. As we can see from below examples, path supports Exact, PathPrefix and RegularExpression. This is similar to the Ingress Path types except for the Regex one.
+
+Exact
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: nginx-route
+  namespace: nginx
+  annotations:
+    konghq.com/strip-path: 'true'
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: kong-gw-demo
+      namespace: kong
+  rules:
+    - matches:
+      - path:
+          type: Exact
+          value: /nginx
+      backendRefs:
+      - name: nginx-svc
+        kind: Service
+        port: 80
